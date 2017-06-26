@@ -70,8 +70,12 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
     };
 
 
+    /**
+     * タイムフリーダウンロード
+     * @param program
+     */
     private onClick = (program: IProgram) =>{
-        this.radikoService.getToken(() =>{
+        this.radikoService.getTimeFree(this.station.id, program, () =>{
 
         });
     };
