@@ -1,6 +1,7 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, Output, EventEmitter} from '@angular/core';
 import {IStation, IRegion} from '../interfaces/station.interface';
 import {RadikoService} from '../services/radiko.service';
+import { parseString } from 'xml2js';
 
 @Component({
     selector: 'StationList',
@@ -9,7 +10,7 @@ import {RadikoService} from '../services/radiko.service';
         <div *ngFor="let region of regions">
             <h4>{{region.regionName}}</h4>
             <ul >
-                <li *ngFor="let station of region.stations">
+                <li *ngFor="let station of region.stations" (click)="onClickStation(station)">
                     <img [src]="station.logoMedium" />
                 </li>
             </ul>
@@ -19,11 +20,15 @@ import {RadikoService} from '../services/radiko.service';
 })
 export class StationListComponent implements OnInit, OnDestroy{
     private regions:IRegion[] = [];
+    private programs = {};
+
+    @Output()
+    private selectStation:EventEmitter<IStation> = new EventEmitter<IStation>();
 
     ngOnInit() {
 
         this.radikoService.getStations().subscribe(res => {
-            let parseString = require('xml2js').parseString;
+            //let parseString = require('xml2js').parseString;
 
             parseString(res.text(), (err, result) => {
                 this.regions = [];
@@ -53,4 +58,11 @@ export class StationListComponent implements OnInit, OnDestroy{
     }
 
     constructor(private radikoService: RadikoService){}
+
+    private onClickStation = (station:IStation) => {
+
+
+
+        this.selectStation.emit(station);
+    };
 }

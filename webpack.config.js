@@ -21,9 +21,9 @@ module.exports = [
                     loader: 'ts-loader'
                 }
             ]
-        }
+        },
+        target: "atom"
     },
-
     {
         entry: {
             style: './scss/style.scss'

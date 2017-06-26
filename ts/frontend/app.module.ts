@@ -7,12 +7,14 @@ import { AppComponent } from './app.component';
 import {AppRoutingModule} from './app.routing.module';
 import {StationListComponent} from './components/stationList.component';
 import {RadikoService} from './services/radiko.service';
+import {ProgramListComponent} from './components/programList.component';
 
 
 @NgModule({
     declarations: [
         AppComponent,
-        StationListComponent
+        StationListComponent,
+        ProgramListComponent
     ],
     imports: [
         BrowserModule,
