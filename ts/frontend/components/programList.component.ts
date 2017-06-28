@@ -7,13 +7,13 @@ import {IProgram} from "../interfaces/program.interface";
 @Component({
     selector: 'ProgramList',
     template: `
-        <h3>番組一覧</h3>
         <div *ngFor="let day of programs">
-            <ul style="border-bottom:1px solid #bbb">
-                <li *ngFor="let program of day" (click)="onClick(program)">
+            <div class="box" *ngFor="let program of day" >
+                <p>
                     {{program.ft}}{{program.title}}
-                </li>
-            </ul>
+                </p>
+                <button class="button" (click)="onClick(program)">保存</button>
+            </div>
         </div>
 
     `
@@ -23,7 +23,7 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
     private station:IStation;
 
     private programs = []
-
+    private loading = false;
     ngOnInit() {
 
 
@@ -75,9 +75,12 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
      * @param program
      */
     private onClick = (program: IProgram) =>{
-        this.radikoService.getTimeFree(this.station.id, program, () =>{
-
-        });
+        if(!this.loading) {
+            this.loading = true;
+            this.radikoService.getTimeFree(this.station.id, program, () => {
+                this.loading = false;
+            });
+        }
     };
 
 }

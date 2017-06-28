@@ -6,21 +6,23 @@ import { parseString } from 'xml2js';
 @Component({
     selector: 'StationList',
     template: `
-        <h3>放送局一覧</h3>
-        <div *ngFor="let region of regions">
-            <h4>{{region.regionName}}</h4>
-            <ul >
-                <li *ngFor="let station of region.stations" (click)="onClickStation(station)">
-                    <img [src]="station.logoMedium" />
-                </li>
-            </ul>
+        <div *ngFor="let region of regions" class="message">
+            <div class="message-header">
+                <p>{{region.regionName}}</p>
+            </div>
+            <div class="message-body">
+                <ul>
+                    <li *ngFor="let station of region.stations" >
+                        <a (click)="onClickStation(station)" title="{{station.name}}"><img [src]="station.logoMedium" /></a>
+                    </li>
+                </ul>
+            </div>
         </div>
         
     `
 })
 export class StationListComponent implements OnInit, OnDestroy{
     private regions:IRegion[] = [];
-    private programs = {};
 
     @Output()
     private selectStation:EventEmitter<IStation> = new EventEmitter<IStation>();
