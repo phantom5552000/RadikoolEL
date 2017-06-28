@@ -12,6 +12,7 @@ import {Utility} from "../utility";
                 <div class="message-header">
                     <p>radikoプレミアム</p>
                 </div>
+                <iframe src="https://radiko.jp/ap/member/login/login_page" style="width:100%; height: 300px;"></iframe>
                 <div class="message-body">
                     <div class="field">
                         <label class="label">メールアドレス</label>
@@ -73,6 +74,11 @@ export class ConfigComponent implements OnInit, OnDestroy {
     private onClickRadikoLogin = () =>{
         if(!this.loading) {
             this.loading = true;
+
+            this.radikoService.login(this.config.radikoEmail, this.config.radikoPassword, res =>{
+               console.log(res);
+               this.loading = false;
+            });
         }
     };
 

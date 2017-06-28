@@ -5,7 +5,8 @@ import {IProgram} from '../interfaces/program.interface';
 
 @Injectable()
 export class RadikoService{
-    constructor(private http: Http){
+    constructor(
+        private http: Http){
 
     }
 
@@ -24,6 +25,27 @@ export class RadikoService{
     public getPrograms = (id: string) =>{
         return this.http.get('http://radiko.jp/v3/program/station/weekly/' + id + '.xml');
     };
+
+
+    /**
+     * radikoプレミアムログイン
+     * @param email
+     * @param password
+     * @param callback
+     * @returns {Subscription}
+     */
+    public login = (email:string, password: string, callback) =>{
+        let headers = new Headers();
+        headers.append("accept", "application/json");
+        headers.append("content-type", "application/x-www-form-urlencoded");
+
+        return this.http.post('https://radiko.jp/ap/member/login/login', {mail: email, pass: password}, { headers: headers}).subscribe(res =>{
+            this.http.get('https://radiko.jp/ap/member/webapi/member/login/check').subscribe(res =>{
+               callback(res)
+            });
+        });
+    };
+
 
 
     /**
@@ -84,12 +106,28 @@ export class RadikoService{
      * @param program
      * @param callback
      */
-    public getTimeFree = (stationId: string, program:IProgram, callback) => {
+    public getTimeFree = (stationId: string, program:IProgram, saveDir:string, callback) => {
         this.getToken((token) => {
             let headers = new Headers();
             headers.append('pragma', 'no-cache');
             headers.append('X-Radiko-AuthToken', token);
 
+            let filename = program.title + '.aac';
+            let path = require('path');
+            filename = path.join(saveDir, stationId, filename);
+
+
+
+            var fs = require('fs-extra');
+            var dir = path.dirname(filename);
+            if (!fs.existsSync(dir)){
+                fs.mkdirsSync(dir);
+            }
+
+
+
+
+            console.log(filename);
             this.http.post('https://radiko.jp/v2/api/ts/playlist.m3u8?station_id=' + stationId + '&ft=' + program.ft + '&to=' + program.to, {}, {headers: headers}).subscribe(res => {
                 let m3u8 = '';
                 let lines = res.text().split(/\r\n|\r|\n/);
@@ -110,11 +148,13 @@ export class RadikoService{
 
                     let exec = require('child_process').execFile;
 
-                    exec('ffmpeg', ['-i', m3u8, '-acodec', 'copy', program.title + '.aac'],
-                        function(err:any, stdout:any, stderr:any){
+                    exec('ffmpeg', ['-i', m3u8, '-acodec', 'copy', filename],
+                        (err:any, stdout:any, stderr:any) => {
                             console.log(err);
                             console.log(stdout);
                             console.log(stderr);
+
+                            callback();
                         }
                     );
 

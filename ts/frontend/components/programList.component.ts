@@ -1,8 +1,10 @@
-import {Component, OnInit, OnDestroy, Input, OnChanges} from '@angular/core';
+import {Component, OnInit, OnDestroy, Input, OnChanges, Output, EventEmitter} from '@angular/core';
 import {IStation, IRegion} from '../interfaces/station.interface';
 import {RadikoService} from '../services/radiko.service';
 import { parseString } from 'xml2js';
-import {IProgram} from "../interfaces/program.interface";
+import {IProgram} from '../interfaces/program.interface';
+import {ConfigService} from '../services/config.service';
+import {IConfig} from '../interfaces/config.interface';
 
 @Component({
     selector: 'ProgramList',
@@ -15,6 +17,7 @@ import {IProgram} from "../interfaces/program.interface";
                 <button class="button" (click)="onClick(program)">保存</button>
             </div>
         </div>
+        
 
     `
 })
@@ -22,15 +25,24 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
     @Input()
     private station:IStation;
 
+    @Output()
+    private changeStatus:EventEmitter<boolean> = new EventEmitter<boolean>();
+
     private programs = []
     private loading = false;
-    ngOnInit() {
+    private selectedProgram:IProgram;
+    private config:IConfig;
 
+    private sub;
+    ngOnInit() {
+        this.sub = this.configService.config.subscribe(value =>{
+            this.config = value;
+        });
 
     }
 
     ngOnDestroy(){
-
+        this.sub.unsubscribe();
     }
 
     ngOnChanges(changes: any) {
@@ -39,7 +51,10 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
         }
     }
 
-    constructor(private radikoService: RadikoService){}
+    constructor(
+        private radikoService: RadikoService,
+        private configService: ConfigService
+    ){}
 
     /**
      * 番組表更新
@@ -77,8 +92,24 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
     private onClick = (program: IProgram) =>{
         if(!this.loading) {
             this.loading = true;
-            this.radikoService.getTimeFree(this.station.id, program, () => {
+            this.changeStatus.emit(true);
+            this.selectedProgram = program;
+
+            let complete = false;
+
+
+            let timer = setInterval(() =>{
+                if(complete){
+                    clearInterval(timer);
+                    this.changeStatus.emit(false);
+                }
+
+            }, 1000);
+
+            this.radikoService.getTimeFree(this.station.id, program, this.config.saveDir, () => {
                 this.loading = false;
+
+                complete = true;
             });
         }
     };

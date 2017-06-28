@@ -24,11 +24,26 @@ import {IStation} from './interfaces/station.interface';
                     <StationList (selectStation)="onSelectStation($event)"></StationList>
                 </div>
                 <div class="column">
-                    <ProgramList [station]="station" *ngIf="station"></ProgramList>
+                    <ProgramList [station]="station" *ngIf="station" (changeStatus)="onChangeStatus($event)"></ProgramList>
                 </div>
             </div>
             <Config *ngIf="tool == 'config'"></Config>
             
+        </div>
+        <div class="modal" [class.is-active]="loading">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">ダウンロード中です</p>
+                </header>
+                <section class="modal-card-body">
+                    ダウンロード中です
+                </section>
+                <footer class="modal-card-foot">
+                    <a class="button is-success">Save changes</a>
+                    <a class="button">Cancel</a>
+                </footer>
+            </div>
         </div>
         
     `
@@ -36,8 +51,13 @@ import {IStation} from './interfaces/station.interface';
 export class AppComponent {
     private station:IStation;
     private tool:string = 'info';
+    private loading:boolean = false;
 
     private onSelectStation = (station:IStation) =>{
         this.station = station;
+    };
+
+    private onChangeStatus = (loading: boolean) =>{
+        this.loading = loading;
     };
 }
