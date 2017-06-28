@@ -10,6 +10,7 @@ import { RadikoService        } from './services/radiko.service';
 import { ProgramListComponent } from './components/programList.component';
 import { ConfigComponent      } from './components/config.component';
 import { ConfigService        } from './services/config.service';
+import { LibraryComponent     } from './components/library.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { ConfigService        } from './services/config.service';
         AppComponent,
         StationListComponent,
         ProgramListComponent,
-        ConfigComponent
+        ConfigComponent,
+        LibraryComponent
     ],
     imports: [
         BrowserModule,

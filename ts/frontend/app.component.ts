@@ -27,6 +27,8 @@ import {IStation} from './interfaces/station.interface';
                     <ProgramList [station]="station" *ngIf="station" (changeStatus)="onChangeStatus($event)"></ProgramList>
                 </div>
             </div>
+            <Library [hidden]="tool != 'library'"></Library>
+            
             <Config *ngIf="tool == 'config'"></Config>
             
         </div>
