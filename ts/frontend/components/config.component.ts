@@ -12,21 +12,12 @@ import {Utility} from "../utility";
                 <div class="message-header">
                     <p>radikoプレミアム</p>
                 </div>
-                <iframe src="https://radiko.jp/ap/member/login/login_page" style="width:100%; height: 300px;"></iframe>
                 <div class="message-body">
-                    <div class="field">
-                        <label class="label">メールアドレス</label>
-                        <p class="control">
-                            <input class="input" name="radikoEmail" [(ngModel)]="config.radikoEmail" type="text" placeholder="メールアドレス">
-                        </p>
-                    </div>
-                    <div class="field">
-                        <label class="label">パスワード</label>
-                        <p class="control">
-                            <input class="input" name="radikoPassword" [(ngModel)]="config.radikoPassword" type="password" placeholder="パスワード">
-                        </p>
-                    </div>
-                    <button type="button" class="button" (click)="onClickRadikoLogin()" [class.is-loading]="loading">ログインテスト</button>
+                    <button type="button" class="button" (click)="isOpenForm = true" *ngIf="!isLogin">ログイン</button>
+                    <button type="button" class="button" (click)="isOpenForm = true" *ngIf="isLogin">ログアウト</button>
+                    <button type="button" class="button" (click)="onClickCloseForm()" *ngIf="isOpenForm">閉じる</button>
+                    <iframe src="http://radiko.jp/" style="width:100%; height: 300px;" *ngIf="isOpenForm && isLogin"></iframe>
+                    <iframe src="https://radiko.jp/ap/member/login/login_page" style="width:100%; height: 300px;" *ngIf="isOpenForm && !isLogin"></iframe>
                 </div>
             </div>
             <div class="message">
@@ -50,12 +41,16 @@ import {Utility} from "../utility";
 export class ConfigComponent implements OnInit, OnDestroy {
     private config:IConfig = {};
     private loading = false;
-
+    private isLogin = false;
+    private isOpenForm = false;
     ngOnInit() {
         this.configService.config.subscribe(value =>{
             this.config = Utility.copy<IConfig>(value);
-            console.log(this.config);
-
+        });
+        this.radikoService.checkLogin().subscribe(res => {
+            this.isLogin = true;
+        }, res =>{
+            this.isLogin = false;
         });
     }
 
@@ -69,19 +64,17 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
 
     /**
-     * radikoプレミアムログインテスト
+     * iframeを閉じる
      */
-    private onClickRadikoLogin = () =>{
-        if(!this.loading) {
-            this.loading = true;
+    private onClickCloseForm = () =>{
+        this.radikoService.checkLogin().subscribe(res => {
+            this.isLogin = true;
+        }, res =>{
+            this.isLogin = false;
+        });
 
-            this.radikoService.login(this.config.radikoEmail, this.config.radikoPassword, res =>{
-               console.log(res);
-               this.loading = false;
-            });
-        }
+        this.isOpenForm = false;
     };
-
 
     /**
      * 設定保存

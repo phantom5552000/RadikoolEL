@@ -1,7 +1,8 @@
 import {Http, Headers, ResponseContentType} from '@angular/http';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import 'rxjs';
 import {IProgram} from '../interfaces/program.interface';
+import {Observable} from "rxjs/Observable";
 
 @Injectable()
 export class RadikoService{
@@ -14,8 +15,12 @@ export class RadikoService{
      * 放送局取得
      * @returns {Observable<Response>}
      */
-    public getStations = () =>{
-        return this.http.get('http://radiko.jp/v2/station/region/full.xml');
+    public getStations = (areaId?:string) =>{
+        if(areaId){
+            return this.http.get('http://radiko.jp/v3/station/list/' + areaId + '.xml');
+        } else {
+            return this.http.get('http://radiko.jp/v3/station/region/full.xml');
+        }
     };
 
     /**
@@ -28,21 +33,20 @@ export class RadikoService{
 
 
     /**
-     * radikoプレミアムログイン
-     * @param email
-     * @param password
-     * @param callback
-     * @returns {Subscription}
+     * radikoプレミアムログインチェック
+     * @returns {Observable<Response>}
      */
-    public login = (email:string, password: string, callback) =>{
-        let headers = new Headers();
-        headers.append("accept", "application/json");
-        headers.append("content-type", "application/x-www-form-urlencoded");
+    public checkLogin = () =>{
+        return this.http.get('https://radiko.jp/ap/member/webapi/member/login/check');
+    };
 
-        return this.http.post('https://radiko.jp/ap/member/login/login', {mail: email, pass: password}, { headers: headers}).subscribe(res =>{
-            this.http.get('https://radiko.jp/ap/member/webapi/member/login/check').subscribe(res =>{
-               callback(res)
-            });
+    /**
+     * 都道府県取得
+     * @returns {Observable<Response>}
+     */
+    public getAreaId = () =>{
+        return this.http.get('http://radiko.jp/area/').map(res =>{
+           return (res.text().match(/JP[0-9]+/gi))[0];
         });
     };
 
@@ -75,7 +79,7 @@ export class RadikoService{
 
                         //  ws.close();
                         var spawn = require('child_process').spawn;
-                        var swfextract = spawn('swfextract', ['-b', '12', 'player.swf', '-o', 'image.png']);
+                        var swfextract = spawn('libs/swfextract', ['-b', '12', 'player.swf', '-o', 'image.png']);
                         swfextract.on('exit', () => {
                             fs.open('image.png', 'r', (err, fd) => {
 
@@ -140,7 +144,7 @@ export class RadikoService{
 
                 if(m3u8 != ''){
                     /*var spawn = require('child_process').spawn;
-                    var ffmpeg = spawn('ffmpeg', ['-i', m3u8, '-acodec', 'copy', program.title + '.aac']);
+                    var ffmpeg = spawn('libs/ffmpeg', ['-i', m3u8, '-acodec', 'copy', program.title + '.aac']);
                     ffmpeg.on('exit', () => {
                         console.log('koko')
                     });
@@ -148,7 +152,7 @@ export class RadikoService{
 
                     let exec = require('child_process').execFile;
 
-                    exec('ffmpeg', ['-i', m3u8, '-acodec', 'copy', filename],
+                    exec('libs/ffmpeg', ['-i', m3u8, '-acodec', 'copy', filename],
                         (err:any, stdout:any, stderr:any) => {
                             console.log(err);
                             console.log(stdout);

@@ -7,7 +7,7 @@ import {ILibrary} from "../interfaces/library.interface";
 @Component({
     selector: 'Library',
     template: `
-        <audio [src]="selectedFile.fullName" *ngIf="selectedFile" controls autoplay></audio>
+        <audio [src]="'file://' + selectedFile.fullName" *ngIf="selectedFile" controls autoplay></audio>
         <table class="table">
             <tbody>
                 <tr *ngFor="let file of files">
