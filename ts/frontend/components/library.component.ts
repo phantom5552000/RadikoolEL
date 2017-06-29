@@ -7,17 +7,12 @@ import {ILibrary} from "../interfaces/library.interface";
 @Component({
     selector: 'Library',
     template: `
-        <audio [src]="'file://' + selectedFile.fullName" *ngIf="selectedFile" controls autoplay></audio>
         <table class="table">
             <tbody>
                 <tr *ngFor="let file of files">
-                    <td>
-                        <p>
-                            {{file.name}}<br />
-                            更新日時:{{file.lastUpdate | date:'yyyy/MM/dd HH:mm:ss'}}
-                        </p>
-                    </td>
-                    <td><button class="button" type="button" (click)="selectedFile = file">再生</button></td>
+                    <td>{{file.name}}</td>
+                    <td>{{file.lastUpdate | date:'yyyy/MM/dd HH:mm:ss'}}</td>
+                    <td class="has-text-right"><button class="button" type="button" (click)="onClick(file)">再生</button></td>
                 </tr>
             </tbody>
         </table>
@@ -26,9 +21,12 @@ import {ILibrary} from "../interfaces/library.interface";
 })
 export class LibraryComponent implements OnInit, OnDestroy{
 
+    @Output()
+    private play:EventEmitter<ILibrary> = new EventEmitter<ILibrary>();
+
     private config:IConfig;
     private files: ILibrary[] = [];
-    private selectedFile:ILibrary;
+
     private sub;
     ngOnInit() {
         this.configService.config.subscribe(value =>{
@@ -44,7 +42,7 @@ export class LibraryComponent implements OnInit, OnDestroy{
 
     constructor(private configService: ConfigService){}
 
-    private refresh = () =>{
+    private refresh = () => {
         let klaw = require('klaw');
         let path = require('path');
 
@@ -52,8 +50,7 @@ export class LibraryComponent implements OnInit, OnDestroy{
             .on('readable', () => {
                 var item
                 while ((item = kl.read())) {
-                    if(!item.stats.isDirectory()) {
-                        console.log(item.stats);
+                    if (!item.stats.isDirectory()) {
                         this.files.push({
                             name: path.basename(item.path),
                             lastUpdate: item.stats.mtime,
@@ -64,18 +61,20 @@ export class LibraryComponent implements OnInit, OnDestroy{
 
             })
             .on('end', () => {
-                this.files.sort((a, b) =>{
-                    if(a.lastUpdate > b.lastUpdate){
+                this.files.sort((a, b) => {
+                    if (a.lastUpdate > b.lastUpdate) {
                         return -1;
                     }
-                    if(a.lastUpdate < b.lastUpdate){
+                    if (a.lastUpdate < b.lastUpdate) {
                         return 1;
                     }
                     return 0;
                 })
-                console.log(this.files) // => [ ... array of files]
             })
 
-     //   console.log(rs);
     };
+
+    private onClick = (library:ILibrary) =>{
+        this.play.emit(library);
+    }
 }

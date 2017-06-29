@@ -1,23 +1,29 @@
 import { Component } from '@angular/core';
 import {IStation} from './interfaces/station.interface';
+import {ILibrary} from "./interfaces/library.interface";
 
 @Component({
     selector: 'App',
     template: `
         <div id="main">
             <div>
-            <nav class="nav has-shadow">
+                <nav class="nav has-shadow">
+                    <div class="container">
+                        <div class="nav-menu nav-left">
+                            <a class="nav-item is-tab" [class.is-active]="tool == 'info'" (click)="tool = 'info'">おしらせ</a>
+                            <a class="nav-item is-tab" [class.is-active]="tool == 'programs'" (click)="tool = 'programs'">番組表</a>
+                            <a class="nav-item is-tab" [class.is-active]="tool == 'library'" (click)="tool = 'library'">ライブラリ</a>
+                        </div>
+                        <div class="nav-menu nav-right">
+                            <a class="nav-item is-tab" [class.is-active]="tool == 'config'" (click)="tool = 'config'">設定</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <div id="player">
                 <div class="container">
-                    <div class="nav-menu nav-left">
-                        <a class="nav-item is-tab" [class.is-active]="tool == 'info'" (click)="tool = 'info'">おしらせ</a>
-                        <a class="nav-item is-tab" [class.is-active]="tool == 'programs'" (click)="tool = 'programs'">番組表</a>
-                        <a class="nav-item is-tab" [class.is-active]="tool == 'library'" (click)="tool = 'library'">ライブラリ</a>
-                    </div>
-                    <div class="nav-menu nav-right">
-                        <a class="nav-item is-tab" [class.is-active]="tool == 'config'" (click)="tool = 'config'">設定</a>
-                    </div>
+                    <audio id="audio" controls autoplay></audio>
                 </div>
-            </nav>
             </div>
             <div style="flex-grow:1; overflow: auto">
                 <div class="container" style="padding-top: 30px;" >
@@ -30,7 +36,7 @@ import {IStation} from './interfaces/station.interface';
                             <ProgramList [station]="station" *ngIf="station" (changeStatus)="onChangeStatus($event)"></ProgramList>
                         </div>
                     </div>
-                    <Library [hidden]="tool != 'library'"></Library>
+                    <Library [hidden]="tool != 'library'" (play)="onPlay($event)"></Library>
                     
                     <Config *ngIf="tool == 'config'"></Config>
                     
@@ -60,11 +66,18 @@ export class AppComponent {
     private tool:string = 'info';
     private loading:boolean = false;
 
+    private playingFile:ILibrary;
+
     private onSelectStation = (station:IStation) =>{
         this.station = station;
     };
 
     private onChangeStatus = (loading: boolean) =>{
         this.loading = loading;
+    };
+
+    private onPlay = (library:ILibrary) =>{
+        this.playingFile = library;
+        document.getElementById('audio').setAttribute('src', 'file://' + library.fullName);
     };
 }

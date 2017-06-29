@@ -9,16 +9,19 @@ import {IConfig} from '../interfaces/config.interface';
 @Component({
     selector: 'ProgramList',
     template: `
-        <div *ngFor="let day of programs">
-            <div class="box" *ngFor="let program of day" >
-                <p>
-                    {{program.ft}}{{program.title}}
-                </p>
-                <button class="button" (click)="onClick(program)">保存</button>
-            </div>
-        </div>
-        
-
+        <table class="table">
+            <tbody>
+            <ng-container *ngFor="let day of programs">
+                <tr *ngFor="let program of day">
+                    <td>{{program.ft.substr(4, 2) + '/' + program.ft.substr(6, 2) + ' ' + program.ft.substr(8, 2) + ':' + program.ft.substr(10, 2)}}</td>
+                    <td>{{program.to.substr(4, 2) + '/' + program.to.substr(6, 2) + ' ' + program.to.substr(8, 2) + ':' + program.to.substr(10, 2)}}</td>
+                    <td>{{program.title}}</td>
+                    <td><button class="button" (click)="onClick(program)">保存</button></td>
+                </tr>
+            </ng-container>
+            
+            </tbody>
+        </table>
     `
 })
 export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
@@ -64,6 +67,10 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
             parseString(res.text(), (err, result) => {
                 let programs = [];
                 this.programs = [];
+
+                let now = new Date();
+                let date = parseInt(now.getFullYear() +  ('00' + (now.getMonth() + 1)).substr(-2, 2) + ('00' + now.getDate()).substr(-2, 2) + ('00' + now.getHours()).substr(-2, 2) + ('00' + now.getMinutes()).substr(-2, 2) + '00', 10);
+
                 result.radiko.stations[0].station[0].progs.forEach(progs => {
 
                     programs = progs.prog.map(prog => {
@@ -77,6 +84,8 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
                             tsInNg: prog.ts_in_ng[0],
                             tsOutNg: prog.ts_out_ng[0]
                         }
+                    }).filter(prog =>{
+                        return parseInt(prog.to, 10) < date;
                     });
                     this.programs.push(programs)
                 });
