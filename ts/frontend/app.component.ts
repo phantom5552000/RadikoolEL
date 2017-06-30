@@ -47,7 +47,7 @@ import {StateService} from './services/state.service';
                         <p class="modal-card-title">ダウンロード中です</p>
                     </header>
                     <section class="modal-card-body">
-                        ダウンロード中です
+                        {{downloadProgress}}
                     </section>
                     <footer class="modal-card-foot">
                         <a class="button is-success">Save changes</a>
@@ -63,6 +63,8 @@ export class AppComponent implements OnInit{
     private station:IStation;
     private tool:string = 'info';
     private loading:boolean = false;
+    private downloadProgress:string = '';
+
 
     private playingFile:ILibrary;
 
@@ -75,6 +77,10 @@ export class AppComponent implements OnInit{
 
         this.stateService.isDownloading.subscribe(value =>{
            this.loading = value;
+        });
+
+        this.stateService.downloadProgress.subscribe(value =>{
+           this.downloadProgress = value;
         });
     }
 

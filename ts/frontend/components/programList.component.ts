@@ -138,21 +138,27 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
           //  this.changeStatus.emit(true);
 
             let complete = false;
-
+            let downloadProgress = '';
 
             let timer = setInterval(() =>{
                 if(complete){
                     clearInterval(timer);
                     this.stateService.isDownloading.next(false);
                 }
+                console.log(downloadProgress);
+                this.stateService.downloadProgress.next(downloadProgress);
 
             }, 1000);
 
-            this.radikoService.getTimeFree(this.station.id, this.selectedProgram, this.config.saveDir, () => {
-                this.loading = false;
+            this.radikoService.getTimeFree(this.station.id, this.selectedProgram, this.config.saveDir, (mes) => {
+                    downloadProgress = mes;
 
-                complete = true;
-            });
+                }, () => {
+                    this.loading = false;
+
+                    complete = true;
+                }
+            );
         }
     };
 

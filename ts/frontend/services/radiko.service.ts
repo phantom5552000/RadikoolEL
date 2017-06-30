@@ -110,7 +110,7 @@ export class RadikoService{
      * @param program
      * @param callback
      */
-    public getTimeFree = (stationId: string, program:IProgram, saveDir:string, callback) => {
+    public getTimeFree = (stationId: string, program:IProgram, saveDir:string, progress, callback) => {
         this.getToken((token) => {
             let headers = new Headers();
             headers.append('pragma', 'no-cache');
@@ -138,14 +138,27 @@ export class RadikoService{
                 }
 
                 if(m3u8 != ''){
-                    /*var spawn = require('child_process').spawn;
-                    var ffmpeg = spawn('libs/ffmpeg', ['-i', m3u8, '-acodec', 'copy', program.title + '.aac']);
-                    ffmpeg.on('exit', () => {
-                        console.log('koko')
-                    });
-*/
+
 
                     if(saveDir) {
+                        var spawn = require('child_process').spawn;
+                         var ffmpeg = spawn('libs/ffmpeg', ['-i', m3u8, '-acodec', 'copy', filename]);
+                        ffmpeg.stdout.on('data', (data) => {
+                            console.log('stdout: ' + data.toString());
+                        });
+                        ffmpeg.stderr.on('data', (data) => {
+                       //     size=   71715kB time=03:24:00.08 bitrate=  48.0kbits/s speed= 132x
+                            let mes = data.toString();
+                            if(mes.indexOf('size') != -1){
+                                progress(mes);
+                            }
+                        });
+                         ffmpeg.on('exit', () => {
+                             callback();
+                         });
+
+
+/*
                         let exec = require('child_process').execFile;
 
                         exec('libs/ffmpeg', ['-i', m3u8, '-acodec', 'copy', filename],
@@ -156,7 +169,7 @@ export class RadikoService{
 
                                 callback();
                             }
-                        );
+                        );*/
                     } else {
                         callback(m3u8);
                     }
