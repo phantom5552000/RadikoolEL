@@ -5,23 +5,43 @@ import { parseString } from 'xml2js';
 import {IProgram} from '../interfaces/program.interface';
 import {ConfigService} from '../services/config.service';
 import {IConfig} from '../interfaces/config.interface';
+import {ILibrary} from '../interfaces/library.interface';
+import {StateService} from '../services/state.service';
 
 @Component({
     selector: 'ProgramList',
     template: `
-        <table class="table is-striped is-narrow">
-            <tbody>
-            <ng-container *ngFor="let day of programs">
-                <tr *ngFor="let program of day">
-                    <td class="datetime">{{program.ft.substr(4, 2) + '/' + program.ft.substr(6, 2) + ' ' + program.ft.substr(8, 2) + ':' + program.ft.substr(10, 2)}}</td>
-                    <td class="datetime">{{program.to.substr(4, 2) + '/' + program.to.substr(6, 2) + ' ' + program.to.substr(8, 2) + ':' + program.to.substr(10, 2)}}</td>
-                    <td>{{program.title}}</td>
-                    <td><button class="button is-small" (click)="onClick(program)">保存</button></td>
-                </tr>
-            </ng-container>
-            
-            </tbody>
-        </table>
+        <div style="display:flex; flex-direction: column; height: 100%">
+            <div style="height: 100px; margin: 0 0 20px 0; flex-grow:1; overflow: auto">
+                <table class="table is-striped is-narrow">
+                    <tbody>
+                    <ng-container *ngFor="let day of programs">
+                        <tr *ngFor="let program of day" (click)="onClickProgram(program)" [class.is-selected]="selectedProgram == program">
+                            <td class="datetime">{{program.ft.substr(4, 2) + '/' + program.ft.substr(6, 2) + ' ' + program.ft.substr(8, 2) + ':' + program.ft.substr(10, 2)}}</td>
+                            <td class="datetime">{{program.to.substr(4, 2) + '/' + program.to.substr(6, 2) + ' ' + program.to.substr(8, 2) + ':' + program.to.substr(10, 2)}}</td>
+                            <td>{{program.title}}</td>
+                        </tr>
+                    </ng-container>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="box program-data" *ngIf="selectedProgram">
+                <p style="padding:0 0 10px 0">
+                    {{selectedProgram.ft.substr(4, 2) + '/' + selectedProgram.ft.substr(6, 2) + ' ' + selectedProgram.ft.substr(8, 2) + ':' + selectedProgram.ft.substr(10, 2)}}〜{{selectedProgram.to.substr(4, 2) + '/' + selectedProgram.to.substr(6, 2) + ' ' + selectedProgram.to.substr(8, 2) + ':' + selectedProgram.to.substr(10, 2)}}<br />
+                    <span *ngIf="selectedProgram.title">{{selectedProgram.title}}</span>
+                    <span *ngIf="selectedProgram.pfm">{{selectedProgram.pfm}}</span>
+                </p>
+                <button type="button" class="button is-info" (click)="onClickDownload(program)">
+                    <span class="icon">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    </span>
+                    <span>保存</span>
+                </button>
+            </div>
+        </div>
+        
+        
     `
 })
 export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
@@ -30,6 +50,9 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
 
     @Output()
     private changeStatus:EventEmitter<boolean> = new EventEmitter<boolean>();
+
+    @Output()
+    private play:EventEmitter<ILibrary> = new EventEmitter<ILibrary>();
 
     private programs = []
     private loading = false;
@@ -55,6 +78,7 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
     }
 
     constructor(
+        private stateService: StateService,
         private radikoService: RadikoService,
         private configService: ConfigService
     ){}
@@ -93,16 +117,25 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
         });
     };
 
+    /**
+     * 番組選択
+     * @param p
+     */
+    private onClickProgram = (p) =>{
+        this.selectedProgram = p;
+    };
+
 
     /**
      * タイムフリーダウンロード
-     * @param program
      */
-    private onClick = (program: IProgram) =>{
+    private onClickDownload = () =>{
         if(!this.loading) {
             this.loading = true;
-            this.changeStatus.emit(true);
-            this.selectedProgram = program;
+
+            this.stateService.isDownloading.next(true);
+
+          //  this.changeStatus.emit(true);
 
             let complete = false;
 
@@ -110,12 +143,12 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
             let timer = setInterval(() =>{
                 if(complete){
                     clearInterval(timer);
-                    this.changeStatus.emit(false);
+                    this.stateService.isDownloading.next(false);
                 }
 
             }, 1000);
 
-            this.radikoService.getTimeFree(this.station.id, program, this.config.saveDir, () => {
+            this.radikoService.getTimeFree(this.station.id, this.selectedProgram, this.config.saveDir, () => {
                 this.loading = false;
 
                 complete = true;

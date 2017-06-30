@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {IStation} from './interfaces/station.interface';
-import {ILibrary} from "./interfaces/library.interface";
+import {ILibrary} from './interfaces/library.interface';
+import {LibraryComponent} from './components/library.component';
+import {StateService} from './services/state.service';
 
 @Component({
     selector: 'App',
@@ -19,13 +21,15 @@ import {ILibrary} from "./interfaces/library.interface";
                 </div>
             </nav>
             <div id="content">
-                <!--<iframe src="https://www.radikool.com/start" [hidden]="tool != 'info'"></iframe>-->
+                <div id="webview-container" [hidden]="tool != 'info'">
+                    
+                </div>
                 <ng-container *ngIf="tool == 'programs'">
                     <div style="width: 25%">
                         <StationList (selectStation)="onSelectStation($event)"></StationList>
                     </div>
                     <div style="width: 75%">
-                        <ProgramList [station]="station" *ngIf="station" (changeStatus)="onChangeStatus($event)"></ProgramList>
+                        <ProgramList [station]="station" *ngIf="station"></ProgramList>
                     </div>
                 </ng-container>
                 <div [hidden]="tool != 'library'" style="width: 100%">
@@ -55,19 +59,36 @@ import {ILibrary} from "./interfaces/library.interface";
         
     `
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
     private station:IStation;
     private tool:string = 'info';
     private loading:boolean = false;
 
     private playingFile:ILibrary;
 
+    ngOnInit(){
+        let webview = document.createElement('webview');
+        document.getElementById('webview-container').appendChild(webview);
+        webview.setAttribute('src', 'https://www.radikool.com/start/');
+        webview.style.width = '100%';
+        webview.style.height = '100%';
+
+        this.stateService.isDownloading.subscribe(value =>{
+           this.loading = value;
+        });
+    }
+
+    constructor(private stateService: StateService){
+        window.addEventListener('beforeunload', (e) => {
+            console.log('beforeunload');
+            e.preventDefault();
+            return false;
+        });
+    }
+
+
     private onSelectStation = (station:IStation) =>{
         this.station = station;
-    };
-
-    private onChangeStatus = (loading: boolean) =>{
-        this.loading = loading;
     };
 
     private onPlay = (library:ILibrary) =>{

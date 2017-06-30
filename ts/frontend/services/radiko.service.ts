@@ -145,17 +145,21 @@ export class RadikoService{
                     });
 */
 
-                    let exec = require('child_process').execFile;
+                    if(saveDir) {
+                        let exec = require('child_process').execFile;
 
-                    exec('libs/ffmpeg', ['-i', m3u8, '-acodec', 'copy', filename],
-                        (err:any, stdout:any, stderr:any) => {
-                            console.log(err);
-                            console.log(stdout);
-                            console.log(stderr);
+                        exec('libs/ffmpeg', ['-i', m3u8, '-acodec', 'copy', filename],
+                            (err: any, stdout: any, stderr: any) => {
+                                console.log(err);
+                                console.log(stdout);
+                                console.log(stderr);
 
-                            callback();
-                        }
-                    );
+                                callback();
+                            }
+                        );
+                    } else {
+                        callback(m3u8);
+                    }
 
 
                 }

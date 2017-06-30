@@ -35,7 +35,6 @@ export class StationListComponent implements OnInit, OnDestroy{
                     result.region.stations.forEach(s1 => {
                         let region: IRegion = {regionId: s1.$.region_id, regionName: s1.$.region_name, stations: []};
                         s1.station.forEach(s2 => {
-                            console.log(s2);
                             region.stations.push({
                                 asciiName: s2.ascii_name[0],
                                 href: s2.href[0],
@@ -55,7 +54,6 @@ export class StationListComponent implements OnInit, OnDestroy{
                     parseString(res.text(), (err, result) => {
                         this.regions = [];
 
-                        console.log(result);
                         let region: IRegion = {
                             regionId: result.stations.$.area_id,
                             regionName: result.stations.$.area_name,
