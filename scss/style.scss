@@ -28,6 +28,24 @@ div{
   height: 100%;
 }
 
+#header {
+
+}
+
+#content{
+  height:100px;
+  flex-grow: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: row;
+  & > div{
+    height: 100%;
+    overflow: auto;
+    padding: 10px;
+  }
+}
+
+
 #player{
   padding: 20px;
 
@@ -45,4 +63,5 @@ div{
 
 .datetime{
   white-space: nowrap;
+  width: 1rem;
 }

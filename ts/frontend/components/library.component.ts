@@ -12,7 +12,13 @@ import {ILibrary} from "../interfaces/library.interface";
                 <tr *ngFor="let file of files">
                     <td>{{file.name}}</td>
                     <td class="datetime">{{file.lastUpdate | date:'yyyy/MM/dd HH:mm:ss'}}</td>
-                    <td class="has-text-right"><button class="button is-small" type="button" (click)="onClick(file)">再生</button></td>
+                    <td class="has-text-right">
+                        <button class="button is-small" type="button" (click)="onClick(file)">
+                            <span class="icon">
+                                <i class="fa fa-play-circle" aria-hidden="true"></i>
+                            </span>
+                        </button>
+                    </td>
                 </tr>
             </tbody>
         </table>

@@ -118,18 +118,13 @@ export class RadikoService{
 
             let filename = program.title + '.aac';
             let path = require('path');
-            filename = path.join(saveDir, stationId, filename);
-
-
+            filename = path.join(saveDir, stationId, program.ft.substr(0, 8), filename);
 
             var fs = require('fs-extra');
             var dir = path.dirname(filename);
             if (!fs.existsSync(dir)){
                 fs.mkdirsSync(dir);
             }
-
-
-
 
             console.log(filename);
             this.http.post('https://radiko.jp/v2/api/ts/playlist.m3u8?station_id=' + stationId + '&ft=' + program.ft + '&to=' + program.to, {}, {headers: headers}).subscribe(res => {
