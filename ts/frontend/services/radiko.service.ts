@@ -9,6 +9,11 @@ export class RadikoService{
     constructor(
         private http: Http){
 
+        var fs = require('fs-extra');
+        if (!fs.existsSync('tmp')){
+            fs.mkdirsSync('tmp');
+        }
+
     }
 
     /**
@@ -73,15 +78,15 @@ export class RadikoService{
             var request = require('request');
             request.get('http://radiko.jp/apps/js/flash/myplayer-release.swf')
                 .on('response', (res) => {
-                    var ws = fs.createWriteStream('player.swf');
+                    var ws = fs.createWriteStream('tmp/player.swf');
                     res.pipe(ws);
                     res.on('end', () => {
 
                         //  ws.close();
                         var spawn = require('child_process').spawn;
-                        var swfextract = spawn('libs/swfextract', ['-b', '12', 'player.swf', '-o', 'image.png']);
+                        var swfextract = spawn('libs/swfextract', ['-b', '12', 'tmp/player.swf', '-o', 'tmp/image.png']);
                         swfextract.on('exit', () => {
-                            fs.open('image.png', 'r', (err, fd) => {
+                            fs.open('tmp/image.png', 'r', (err, fd) => {
 
                                 var buffer = new Buffer(length);
                                 fs.readSync(fd, buffer, 0, length, offset);
