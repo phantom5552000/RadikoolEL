@@ -44,6 +44,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
     private isLogin = false;
     private isOpenForm = false;
     ngOnInit() {
+        console.log(__dirname);
         this.configService.config.subscribe(value =>{
             this.config = Utility.copy<IConfig>(value);
         });

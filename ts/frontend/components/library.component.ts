@@ -7,12 +7,12 @@ import {ILibrary} from "../interfaces/library.interface";
 @Component({
     selector: 'Library',
     template: `
-        <table class="table">
+        <table class="table is-striped is-narrow">
             <tbody>
                 <tr *ngFor="let file of files">
                     <td>{{file.name}}</td>
-                    <td>{{file.lastUpdate | date:'yyyy/MM/dd HH:mm:ss'}}</td>
-                    <td class="has-text-right"><button class="button" type="button" (click)="onClick(file)">再生</button></td>
+                    <td class="datetime">{{file.lastUpdate | date:'yyyy/MM/dd HH:mm:ss'}}</td>
+                    <td class="has-text-right"><button class="button is-small" type="button" (click)="onClick(file)">再生</button></td>
                 </tr>
             </tbody>
         </table>

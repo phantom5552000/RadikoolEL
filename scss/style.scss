@@ -9,6 +9,18 @@ iframe{
   width: 100%;
   height: 100%;
 }
+div{
+  box-sizing: border-box;
+}
+
+.table {
+  td, th {
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 
 #main{
   display: flex;
@@ -17,11 +29,20 @@ iframe{
 }
 
 #player{
-  padding: 10px;
-  height: 60px;
+  padding: 20px;
 
   audio{
     width: 100%;
-    height: 100%;
+    height: 30px;
   }
+  p{
+    margin: 0 0 5px 0;
+  }
+  .box{
+    padding: 0.75rem;
+  }
+}
+
+.datetime{
+  white-space: nowrap;
 }

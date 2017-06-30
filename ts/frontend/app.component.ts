@@ -20,13 +20,9 @@ import {ILibrary} from "./interfaces/library.interface";
                     </div>
                 </nav>
             </div>
-            <div id="player">
-                <div class="container">
-                    <audio id="audio" controls autoplay></audio>
-                </div>
-            </div>
+            
             <div style="flex-grow:1; overflow: auto">
-                <div class="container" style="padding-top: 30px;" >
+                <div class="container" style="padding-top: 20px">
                    <!-- <iframe src="https://www.radikool.com/start" [hidden]="tool != 'info'"></iframe>-->
                     <div class="columns" *ngIf="tool == 'programs'">
                         <div class="column is-3">
@@ -57,7 +53,7 @@ import {ILibrary} from "./interfaces/library.interface";
                     </div>
                 </div>
             </div>
-                
+            <Player [file]="playingFile"></Player>
         </div>
     `
 })
@@ -78,6 +74,5 @@ export class AppComponent {
 
     private onPlay = (library:ILibrary) =>{
         this.playingFile = library;
-        document.getElementById('audio').setAttribute('src', 'file://' + library.fullName);
     };
 }

@@ -2,7 +2,7 @@ import {Http, Headers, ResponseContentType} from '@angular/http';
 import {Injectable} from '@angular/core';
 import 'rxjs';
 import {IProgram} from '../interfaces/program.interface';
-import {Observable} from "rxjs/Observable";
+import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 export class RadikoService{

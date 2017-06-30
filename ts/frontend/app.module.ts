@@ -11,6 +11,8 @@ import { ProgramListComponent } from './components/programList.component';
 import { ConfigComponent      } from './components/config.component';
 import { ConfigService        } from './services/config.service';
 import { LibraryComponent     } from './components/library.component';
+import { Setting              } from './setting';
+import { PlayerComponent      } from './components/player.component';
 
 
 @NgModule({
@@ -19,7 +21,8 @@ import { LibraryComponent     } from './components/library.component';
         StationListComponent,
         ProgramListComponent,
         ConfigComponent,
-        LibraryComponent
+        LibraryComponent,
+        PlayerComponent
     ],
     imports: [
         BrowserModule,
@@ -29,7 +32,8 @@ import { LibraryComponent     } from './components/library.component';
     ],
     providers: [
         RadikoService,
-        ConfigService
+        ConfigService,
+        Setting
     ],
     bootstrap: [AppComponent]
 })

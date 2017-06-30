@@ -9,14 +9,14 @@ import {IConfig} from '../interfaces/config.interface';
 @Component({
     selector: 'ProgramList',
     template: `
-        <table class="table">
+        <table class="table is-striped is-narrow">
             <tbody>
             <ng-container *ngFor="let day of programs">
                 <tr *ngFor="let program of day">
-                    <td>{{program.ft.substr(4, 2) + '/' + program.ft.substr(6, 2) + ' ' + program.ft.substr(8, 2) + ':' + program.ft.substr(10, 2)}}</td>
-                    <td>{{program.to.substr(4, 2) + '/' + program.to.substr(6, 2) + ' ' + program.to.substr(8, 2) + ':' + program.to.substr(10, 2)}}</td>
+                    <td class="datetime">{{program.ft.substr(4, 2) + '/' + program.ft.substr(6, 2) + ' ' + program.ft.substr(8, 2) + ':' + program.ft.substr(10, 2)}}</td>
+                    <td class="datetime">{{program.to.substr(4, 2) + '/' + program.to.substr(6, 2) + ' ' + program.to.substr(8, 2) + ':' + program.to.substr(10, 2)}}</td>
                     <td>{{program.title}}</td>
-                    <td><button class="button" (click)="onClick(program)">保存</button></td>
+                    <td><button class="button is-small" (click)="onClick(program)">保存</button></td>
                 </tr>
             </ng-container>
             
