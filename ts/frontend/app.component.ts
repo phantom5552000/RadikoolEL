@@ -4,6 +4,16 @@ import {ILibrary} from './interfaces/library.interface';
 import {LibraryComponent} from './components/library.component';
 import {StateService} from './services/state.service';
 
+
+interface IWebViewEvent extends Event{
+    url:string;
+}
+
+class WebView extends HTMLElement{
+    public getURL = ():string => { return ''};
+    public stop = () =>{};
+}
+
 @Component({
     selector: 'App',
     template: `
@@ -22,7 +32,6 @@ import {StateService} from './services/state.service';
             </nav>
             <div id="content">
                 <div id="webview-container" [hidden]="tool != 'info'">
-                    
                 </div>
                 <ng-container *ngIf="tool == 'programs'">
                     <div style="width: 25%">
@@ -68,19 +77,40 @@ export class AppComponent implements OnInit{
 
     private playingFile:ILibrary;
 
-    ngOnInit(){
-        let webview = document.createElement('webview');
+    ngOnInit() {
+        const startPage = 'https://www.radikool.com/start/';
+        let webview = document.createElement('webview') as WebView;
         document.getElementById('webview-container').appendChild(webview);
-        webview.setAttribute('src', 'https://www.radikool.com/start/');
+        webview.setAttribute('src', startPage);
         webview.style.width = '100%';
         webview.style.height = '100%';
 
-        this.stateService.isDownloading.subscribe(value =>{
-           this.loading = value;
+        this.stateService.isDownloading.subscribe(value => {
+            this.loading = value;
         });
 
-        this.stateService.downloadProgress.subscribe(value =>{
-           this.downloadProgress = value;
+        this.stateService.downloadProgress.subscribe(value => {
+            this.downloadProgress = value;
+        });
+
+        const shell = require('electron').shell;
+        console.log(shell);
+
+        webview.addEventListener('new-window', (e: IWebViewEvent) => {
+            shell.openExternal(e.url);
+        });
+
+        webview.addEventListener('will-navigate', (e: IWebViewEvent) => {
+            webview.stop();
+            console.log(e.url);
+            e.preventDefault();
+            shell.openExternal(e.url);
+            return false;
+        });
+        webview.addEventListener('dom-ready', (e: IWebViewEvent) => {
+            webview.addEventListener('did-start-loading', (e) => {
+                    webview.stop();
+            });
         });
     }
 
