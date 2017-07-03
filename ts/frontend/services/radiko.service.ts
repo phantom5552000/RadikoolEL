@@ -3,6 +3,10 @@ import {Injectable} from '@angular/core';
 import 'rxjs';
 import {IProgram} from '../interfaces/program.interface';
 import {Observable} from 'rxjs/Observable';
+import * as Path from "path";
+
+let app = require('electron').remote.app;
+const libDir = Path.join(app.getAppPath(), 'libs');
 
 @Injectable()
 export class RadikoService{
@@ -84,7 +88,7 @@ export class RadikoService{
 
                         //  ws.close();
                         var spawn = require('child_process').spawn;
-                        var swfextract = spawn('libs/swfextract', ['-b', '12', 'tmp/player.swf', '-o', 'tmp/image.png']);
+                        var swfextract = spawn(Path.join(libDir, 'win32', 'swfextract'), ['-b', '12', 'tmp/player.swf', '-o', 'tmp/image.png']);
                         swfextract.on('exit', () => {
                             fs.open('tmp/image.png', 'r', (err, fd) => {
 
@@ -147,7 +151,7 @@ export class RadikoService{
 
                     if(saveDir) {
                         var spawn = require('child_process').spawn;
-                         var ffmpeg = spawn('libs/ffmpeg', ['-i', m3u8, '-acodec', 'copy', filename]);
+                         var ffmpeg = spawn(Path.join(libDir, 'win32', 'ffmpeg'), ['-i', m3u8, '-acodec', 'copy', filename]);
                         ffmpeg.stdout.on('data', (data) => {
                             console.log('stdout: ' + data.toString());
                         });
