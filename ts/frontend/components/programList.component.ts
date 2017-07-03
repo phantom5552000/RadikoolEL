@@ -7,6 +7,7 @@ import {ConfigService} from '../services/config.service';
 import {IConfig} from '../interfaces/config.interface';
 import {ILibrary} from '../interfaces/library.interface';
 import {StateService} from '../services/state.service';
+import {Utility} from "../utility";
 
 @Component({
     selector: 'ProgramList',
@@ -115,6 +116,9 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
                 });
             });
         });
+
+
+
     };
 
     /**

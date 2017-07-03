@@ -56,11 +56,10 @@ class WebView extends HTMLElement{
                         <p class="modal-card-title">ダウンロード中です</p>
                     </header>
                     <section class="modal-card-body">
-                        {{downloadProgress}}
+                        <progress class="progress is-primary" [value]="downloadProgress" max="100"></progress>
                     </section>
-                    <footer class="modal-card-foot">
-                        <a class="button is-success">Save changes</a>
-                        <a class="button">Cancel</a>
+                    <footer class="modal-card-foot has-text-right" style="display: block">
+                        <a class="button">キャンセル</a>
                     </footer>
                 </div>
             </div>

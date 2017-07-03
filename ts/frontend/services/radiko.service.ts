@@ -4,6 +4,7 @@ import 'rxjs';
 import {IProgram} from '../interfaces/program.interface';
 import {Observable} from 'rxjs/Observable';
 import * as Path from "path";
+import {Utility} from "../utility";
 
 let app = require('electron').remote.app;
 const libDir = Path.join(app.getAppPath(), 'libs');
@@ -88,7 +89,9 @@ export class RadikoService{
 
                         //  ws.close();
                         var spawn = require('child_process').spawn;
-                        var swfextract = spawn(Path.join(libDir, 'win32', 'swfextract'), ['-b', '12', 'tmp/player.swf', '-o', 'tmp/image.png']);
+                        var swfextract = spawn(Path.join('libs', 'swfextract'), ['-b', '12', 'tmp/player.swf', '-o', 'tmp/image.png']);
+
+                //        var swfextract = spawn(Path.join(libDir, 'win32', 'swfextract'), ['-b', '12', 'tmp/player.swf', '-o', 'tmp/image.png']);
                         swfextract.on('exit', () => {
                             fs.open('tmp/image.png', 'r', (err, fd) => {
 
@@ -136,6 +139,7 @@ export class RadikoService{
             }
 
             console.log(filename);
+            let duration = Utility.getDuration(program.ft, program.to);
             this.http.post('https://radiko.jp/v2/api/ts/playlist.m3u8?station_id=' + stationId + '&ft=' + program.ft + '&to=' + program.to, {}, {headers: headers}).subscribe(res => {
                 let m3u8 = '';
                 let lines = res.text().split(/\r\n|\r|\n/);
@@ -147,11 +151,11 @@ export class RadikoService{
                 }
 
                 if(m3u8 != ''){
-
-
                     if(saveDir) {
                         var spawn = require('child_process').spawn;
-                         var ffmpeg = spawn(Path.join(libDir, 'win32', 'ffmpeg'), ['-i', m3u8, '-acodec', 'copy', filename]);
+                        var ffmpeg = spawn(Path.join('libs', 'ffmpeg'), ['-i', m3u8, '-acodec', 'copy', filename]);
+                       // var ffmpeg = spawn(Path.join(libDir, 'win32', 'ffmpeg'), ['-i', m3u8, '-acodec', 'copy', filename]);
+                        let duration = Utility.getDuration(program.ft, program.to);
                         ffmpeg.stdout.on('data', (data) => {
                             console.log('stdout: ' + data.toString());
                         });
@@ -159,7 +163,17 @@ export class RadikoService{
                        //     size=   71715kB time=03:24:00.08 bitrate=  48.0kbits/s speed= 132x
                             let mes = data.toString();
                             if(mes.indexOf('size') != -1){
-                                progress(mes);
+
+                                let m = mes.match(/time=([0-9:.]+)/);
+                                if(m[1]){
+                                    console.log(m[1]);
+                                    let sec = parseInt(m[1].split(':')[0], 10) * 3600 + parseInt(m[1].split(':')[1], 10) * 60 + parseInt(m[1].split(':')[2], 10);
+
+                                    progress(Math.round((sec / duration) * 100));
+                                }
+
+
+                             //   progress(mes);
                             }
                         });
                          ffmpeg.on('exit', () => {
