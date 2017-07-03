@@ -7,7 +7,8 @@ import * as Path from "path";
 import {Utility} from "../utility";
 
 let app = require('electron').remote.app;
-const libDir = Path.join(app.getAppPath(), 'libs');
+let process = require('electron').remote.process;
+const libDir = Path.join(app.getAppPath(), 'libs', process.platform);
 
 @Injectable()
 export class RadikoService{
@@ -18,7 +19,6 @@ export class RadikoService{
         if (!fs.existsSync('tmp')){
             fs.mkdirsSync('tmp');
         }
-
     }
 
     /**
@@ -26,11 +26,13 @@ export class RadikoService{
      * @returns {Observable<Response>}
      */
     public getStations = (areaId?:string) =>{
+        console.log(libDir);
         if(areaId){
             return this.http.get('http://radiko.jp/v3/station/list/' + areaId + '.xml');
         } else {
             return this.http.get('http://radiko.jp/v3/station/region/full.xml');
         }
+
     };
 
     /**
@@ -89,9 +91,8 @@ export class RadikoService{
 
                         //  ws.close();
                         var spawn = require('child_process').spawn;
-                        var swfextract = spawn(Path.join('libs', 'swfextract'), ['-b', '12', 'tmp/player.swf', '-o', 'tmp/image.png']);
 
-                //        var swfextract = spawn(Path.join(libDir, 'win32', 'swfextract'), ['-b', '12', 'tmp/player.swf', '-o', 'tmp/image.png']);
+                        var swfextract = spawn(Path.join(libDir, 'swfextract'), ['-b', '12', 'tmp/player.swf', '-o', 'tmp/image.png']);
                         swfextract.on('exit', () => {
                             fs.open('tmp/image.png', 'r', (err, fd) => {
 
@@ -153,8 +154,7 @@ export class RadikoService{
                 if(m3u8 != ''){
                     if(saveDir) {
                         var spawn = require('child_process').spawn;
-                        var ffmpeg = spawn(Path.join('libs', 'ffmpeg'), ['-i', m3u8, '-acodec', 'copy', filename]);
-                       // var ffmpeg = spawn(Path.join(libDir, 'win32', 'ffmpeg'), ['-i', m3u8, '-acodec', 'copy', filename]);
+                        var ffmpeg = spawn(Path.join(libDir, 'ffmpeg'), ['-i', m3u8, '-acodec', 'copy', filename]);
                         let duration = Utility.getDuration(program.ft, program.to);
                         ffmpeg.stdout.on('data', (data) => {
                             console.log('stdout: ' + data.toString());
