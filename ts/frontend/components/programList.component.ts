@@ -149,7 +149,6 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
                     clearInterval(timer);
                     this.stateService.isDownloading.next(false);
                 }
-                console.log(downloadProgress);
                 this.stateService.downloadProgress.next(downloadProgress);
 
             }, 1000);
