@@ -7,4 +7,5 @@ export interface IProgram{
     title: string;
     tsInNg: number;
     tsOutNg: number;
+    downloadable:boolean;
 }

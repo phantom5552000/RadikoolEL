@@ -14,16 +14,25 @@ import {Utility} from "../utility";
     template: `
         <div style="display:flex; flex-direction: column; height: 100%">
             <div style="height: 100px; margin: 0 0 20px 0; flex-grow:1; overflow: auto">
-                <table class="table is-striped is-narrow">
-                    <tbody>
-                    <ng-container *ngFor="let day of programs">
-                        <tr *ngFor="let program of day" (click)="onClickProgram(program)" [class.is-selected]="selectedProgram == program">
-                            <td class="datetime">{{program.ft.substr(4, 2) + '/' + program.ft.substr(6, 2) + ' ' + program.ft.substr(8, 2) + ':' + program.ft.substr(10, 2)}}</td>
-                            <td class="datetime">{{program.to.substr(4, 2) + '/' + program.to.substr(6, 2) + ' ' + program.to.substr(8, 2) + ':' + program.to.substr(10, 2)}}</td>
-                            <td>{{program.title}}</td>
+                <table id="timetable">
+                    <thead>
+                        <tr>
+                            <th *ngFor="let date of dates">{{date}}</th>
                         </tr>
-                    </ng-container>
-
+                    
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let hour of hours">
+                            <td *ngFor="let date of dates">
+                                <div>
+                                    <div *ngFor="let program of programs[hour][date]" (click)="onClickProgram(program)" [class.selected]="selectedProgram == program" [class.disabled]="!program.downloadable">
+                                        {{program.ft.substr(8, 2) + ':' + program.ft.substr(10, 2)}}<br />
+                                        {{program.title}}
+                                    </div>
+                                </div>
+                               
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -33,7 +42,7 @@ import {Utility} from "../utility";
                     <span *ngIf="selectedProgram.title">{{selectedProgram.title}}</span>
                     <span *ngIf="selectedProgram.pfm">{{selectedProgram.pfm}}</span>
                 </p>
-                <button type="button" class="button is-info" (click)="onClickDownload(program)">
+                <button type="button" class="button is-info" (click)="onClickDownload(program)" *ngIf="selectedProgram.downloadable">
                     <span class="icon">
                         <i class="fa fa-floppy-o" aria-hidden="true"></i>
                     </span>
@@ -55,10 +64,13 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
     @Output()
     private play:EventEmitter<ILibrary> = new EventEmitter<ILibrary>();
 
-    private programs = []
+    private programs = {};
     private loading = false;
     private selectedProgram:IProgram;
     private config:IConfig;
+
+    private dates:number[] = [];
+    private hours = [ 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28 ];
 
     private sub;
     ngOnInit() {
@@ -90,15 +102,16 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
     private refreshProgramList = () =>{
         this.radikoService.getPrograms(this.station.id).subscribe(res => {
             parseString(res.text(), (err, result) => {
-                let programs = [];
-                this.programs = [];
+                let programs = {};
+                this.programs = {};
+                this.dates = [];
 
                 let now = new Date();
-                let date = parseInt(now.getFullYear() +  ('00' + (now.getMonth() + 1)).substr(-2, 2) + ('00' + now.getDate()).substr(-2, 2) + ('00' + now.getHours()).substr(-2, 2) + ('00' + now.getMinutes()).substr(-2, 2) + '00', 10);
+                let now_date = parseInt(now.getFullYear() +  ('00' + (now.getMonth() + 1)).substr(-2, 2) + ('00' + now.getDate()).substr(-2, 2) + ('00' + now.getHours()).substr(-2, 2) + ('00' + now.getMinutes()).substr(-2, 2) + '00', 10);
 
                 result.radiko.stations[0].station[0].progs.forEach(progs => {
 
-                    programs = progs.prog.map(prog => {
+                    /*programs = progs.prog.map(prog => {
                         return {
                             ft: prog.$.ft,
                             to: prog.$.to,
@@ -107,13 +120,58 @@ export class ProgramListComponent implements OnInit, OnDestroy, OnChanges{
                             pfm: prog.pfm[0],
                             title: prog.title[0],
                             tsInNg: prog.ts_in_ng[0],
-                            tsOutNg: prog.ts_out_ng[0]
+                            tsOutNg: prog.ts_out_ng[0],
+                            downloadble: parseInt(prog.to, 10) < date
                         }
-                    }).filter(prog =>{
-                        return parseInt(prog.to, 10) < date;
+                    });*/
+                    let date =progs.prog[0].$.ft.substr(0, 8);
+                    this.dates.push(date);
+                    progs.prog.forEach(prog => {
+                        let hour = parseInt(prog.$.ft.substr(8, 2), 10);
+
+                        if(hour < 5){
+                            hour += 24;
+                        }
+                        if(!programs[hour]){
+                            programs[hour] = {};
+                        }
+                        if(!programs[hour][date]){
+                            programs[hour][date] = [];
+                        }
+
+                        programs[hour][date].push({
+                            ft: prog.$.ft,
+                            to: prog.$.to,
+                            img: prog.img[0],
+                            info: prog.info[0],
+                            pfm: prog.pfm[0],
+                            title: prog.title[0],
+                            tsInNg: prog.ts_in_ng[0],
+                            tsOutNg: prog.ts_out_ng[0],
+                            downloadable: parseInt(prog.$.to, 10) < now_date
+                        });
                     });
-                    this.programs.push(programs)
+
+
+                    this.hours.forEach(hour =>{
+                       if(!programs[hour]){
+                           programs[hour] = {};
+                       }
+                       this.dates.forEach(date =>{
+                          if(!programs[hour][date]){
+                              programs[hour][date] = [];
+                          }
+                       });
+                    });
+
+
+                    this.programs = programs;
+
+
+
+                    //this.programs.push(programs)
                 });
+                console.log(programs);
             });
         });
 
