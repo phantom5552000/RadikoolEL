@@ -1,4 +1,4 @@
-import {Component, OnInit, OnDestroy, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef} from '@angular/core';
 import {RadikoService} from '../services/radiko.service';
 import {ConfigService} from '../services/config.service';
 import {IConfig} from '../interfaces/config.interface';
@@ -25,11 +25,22 @@ import {Utility} from "../utility";
                     <p>一般設定</p>
                 </div>
                 <div class="message-body">
-                    <div class="field">
-                        <label class="label">保存パス</label>
-                        <p class="control">
-                            <input class="input" type="text" name="saveDir" [(ngModel)]="config.saveDir" placeholder="保存パス">
-                        </p>
+                    <div class="field ">
+                            <label class="label">保存パス</label>
+
+                        <div class="field has-addons">
+                            <p class="control">
+                                <input class="input" type="text" name="saveDir" [(ngModel)]="config.saveDir" placeholder="保存パス">
+                            </p>
+                            <p class="control">
+                                <button class="button" type="button" (click)="onClickSaveDir()">
+                                <span class="icon is-small">
+                                    <i class="fa fa-folder-open-o"></i>
+                                </span>
+                                </button>
+                            </p>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -59,7 +70,9 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
     }
 
-    constructor(private configService: ConfigService,
+    constructor(
+                private chRef: ChangeDetectorRef,
+                private configService: ConfigService,
                 private radikoService: RadikoService) {
     }
 
@@ -77,17 +90,28 @@ export class ConfigComponent implements OnInit, OnDestroy {
         this.isOpenForm = false;
     };
 
+
+    /**
+     * 録音パス選択
+     */
+    private onClickSaveDir = () =>{
+        let dialog = require('electron').remote.dialog;
+        dialog.showOpenDialog(null, {
+            properties: ['openDirectory']
+        }, (dir) => {
+            this.config.saveDir = dir[0];
+            this.chRef.detectChanges();
+        });
+    };
+
     /**
      * 設定保存
      */
     private onSubmit = () => {
 
         let save = Utility.copy<IConfig>(this.config);
-        save.radikoEmail = Utility.encrypt(this.config.radikoEmail);
-        save.radikoPassword = Utility.encrypt(this.config.radikoPassword);
-
         localStorage.setItem('config', JSON.stringify(save));
-
+        this.configService.config.next(save);
     };
 
 
