@@ -171,6 +171,7 @@ export class RadikoService{
                             }
                         });
                          this.ffmpeg.on('exit', () => {
+                             this.ffmpeg = null;
                              callback();
                          });
 
@@ -183,6 +184,16 @@ export class RadikoService{
 
             });
         });
+    };
+
+    /**
+     * ダウンロードキャンセル
+     */
+    public cancelDownload = () =>{
+        if(this.ffmpeg){
+            this.ffmpeg.kill();
+            this.ffmpeg = null;
+        }
     };
 
 

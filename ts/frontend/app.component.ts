@@ -3,6 +3,7 @@ import {IStation} from './interfaces/station.interface';
 import {ILibrary} from './interfaces/library.interface';
 import {LibraryComponent} from './components/library.component';
 import {StateService} from './services/state.service';
+import {RadikoService} from "./services/radiko.service";
 
 
 interface IWebViewEvent extends Event{
@@ -59,7 +60,7 @@ class WebView extends HTMLElement{
                         <progress class="progress is-primary" [value]="downloadProgress" max="100"></progress>
                     </section>
                     <footer class="modal-card-foot has-text-right" style="display: block">
-                        <a class="button">キャンセル</a>
+                        <a class="button" (click)="onClickCancel()">キャンセル</a>
                     </footer>
                 </div>
             </div>
@@ -113,12 +114,16 @@ export class AppComponent implements OnInit{
         });
     }
 
-    constructor(private stateService: StateService){
+    constructor(
+        private stateService: StateService,
+        private radikoService: RadikoService) {
         window.addEventListener('beforeunload', (e) => {
             console.log('beforeunload');
             e.preventDefault();
             return false;
         });
+
+
     }
 
 
@@ -128,5 +133,20 @@ export class AppComponent implements OnInit{
 
     private onPlay = (library:ILibrary) =>{
         this.playingFile = library;
+    };
+
+    private onClickCancel = () =>{
+        let dialog = require('electron').remote.dialog;
+        dialog.showMessageBox(null, {
+            type: 'info',
+            buttons: ['OK', 'Cancel'],
+            title: '確認',
+            message: '確認',
+            detail: 'ダウンロードをキャンセルしますか？'
+        }, res =>{
+            if(res == 0){
+                this.radikoService.cancelDownload();
+            }
+        });
     };
 }
