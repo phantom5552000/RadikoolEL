@@ -7,7 +7,6 @@ import {ConfigService} from '../services/config.service';
 import {IConfig} from '../interfaces/config.interface';
 import {ILibrary} from '../interfaces/library.interface';
 import {StateService} from '../services/state.service';
-import {Utility} from "../utility";
 
 @Component({
     selector: 'ProgramList',
@@ -19,7 +18,6 @@ import {Utility} from "../utility";
                         <tr>
                             <th *ngFor="let date of dates">{{date}}</th>
                         </tr>
-                    
                     </thead>
                     <tbody>
                         <tr *ngFor="let hour of hours">

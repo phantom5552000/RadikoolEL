@@ -118,7 +118,6 @@ export class AppComponent implements OnInit{
         private stateService: StateService,
         private radikoService: RadikoService) {
         window.addEventListener('beforeunload', (e) => {
-            console.log('beforeunload');
             e.preventDefault();
             return false;
         });

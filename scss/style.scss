@@ -82,7 +82,8 @@ div{
     text-align: center;
     padding: 0.2rem;
     border-right: 1px solid #bbb;
-
+    background: #333;
+    color: #fff;
     &:first-child{
       border-left: 1px solid #bbb;
     }

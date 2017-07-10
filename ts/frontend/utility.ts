@@ -54,14 +54,9 @@ export class Utility{
      * @returns {number}
      */
     public static getDuration = (from:string, to:string) => {
-        //let duration:number = 0;
-
         let d1 = new Date(parseInt(from.substr(0, 4), 10), parseInt(from.substr(4, 2), 10) -1, parseInt(from.substr(6, 2), 10), parseInt(from.substr(8, 2), 10), parseInt(from.substr(10, 2), 10));
         let d2 = new Date(parseInt(to.substr(0, 4), 10), parseInt(to.substr(4, 2), 10) -1, parseInt(to.substr(6, 2), 10), parseInt(to.substr(8, 2), 10), parseInt(to.substr(10, 2), 10));
-
-        let duration = Math.round((d2 - d1) / 1000);
-
-
+        let duration = Math.round((d2.getTime() - d1.getTime()) / 1000);
         return duration;
     };
 }

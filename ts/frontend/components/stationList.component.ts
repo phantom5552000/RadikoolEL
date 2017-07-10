@@ -10,10 +10,10 @@ import { parseString } from 'xml2js';
             <div class="message-header">
                 <p>{{region.regionName}}</p>
             </div>
-            <div class="message-body">
-                <ul>
-                    <li *ngFor="let station of region.stations" >
-                        <a (click)="onClickStation(station)" title="{{station.name}}"><img [src]="station.logo" /></a>
+            <div class="message-body menu">
+                <ul class="menu-list">
+                    <li *ngFor="let station of region.stations">
+                        <a (click)="onClickStation(station)" title="{{station.name}}" [class.is-active]="station == selectedStation" class="has-text-centered"><img [src]="station.logo" /></a>
                     </li>
                 </ul>
             </div>
@@ -23,9 +23,13 @@ import { parseString } from 'xml2js';
 })
 export class StationListComponent implements OnInit, OnDestroy{
     private regions:IRegion[] = [];
+    private selectedStation;
+
 
     @Output()
     private selectStation:EventEmitter<IStation> = new EventEmitter<IStation>();
+
+
 
     ngOnInit() {
         this.radikoService.checkLogin().subscribe(res =>{
@@ -35,13 +39,20 @@ export class StationListComponent implements OnInit, OnDestroy{
                     result.region.stations.forEach(s1 => {
                         let region: IRegion = {regionId: s1.$.region_id, regionName: s1.$.region_name, stations: []};
                         s1.station.forEach(s2 => {
-                            region.stations.push({
+                            let station = {
                                 asciiName: s2.ascii_name[0],
                                 href: s2.href[0],
                                 id: s2.id[0],
                                 logo: s2.logo[0]._,
                                 name: s2.name[0],
-                            });
+                            };
+                            region.stations.push(station);
+
+                            if(!this.selectedStation){
+                                this.selectedStation = station;
+                                this.selectStation.emit(station);
+                            }
+
                         });
                         this.regions.push(region);
                     });
@@ -60,13 +71,20 @@ export class StationListComponent implements OnInit, OnDestroy{
                             stations: []
                         };
                         result.stations.station.forEach(s => {
-                                region.stations.push({
-                                    asciiName: s.ascii_name[0],
-                                    href: s.href[0],
-                                    id: s.id[0],
-                                    logo: s.logo[0]._,
-                                    name: s.name[0],
-                                });
+                            let station = {
+                                asciiName: s.ascii_name[0],
+                                href: s.href[0],
+                                id: s.id[0],
+                                logo: s.logo[0]._,
+                                name: s.name[0],
+                            };
+
+                            region.stations.push(station);
+
+                            if (!this.selectedStation) {
+                                this.selectedStation = station;
+                                this.selectStation.emit(station);
+                            }
 
                         });
                         this.regions.push(region);
@@ -84,6 +102,7 @@ export class StationListComponent implements OnInit, OnDestroy{
     constructor(private radikoService: RadikoService){}
 
     private onClickStation = (station:IStation) => {
+        this.selectedStation = station;
         this.selectStation.emit(station);
     };
 }
