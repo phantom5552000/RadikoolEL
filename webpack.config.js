@@ -4,9 +4,9 @@ var path = require('path');
 
 module.exports = [
     {
-        entry: './ts/frontend/app.ts',
+        entry: './src/renderer/ts/app.ts',
         output: {
-            filename: './frontend/js/app.js'
+            filename: './dist/renderer/js/app.js'
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js']
@@ -26,10 +26,10 @@ module.exports = [
     },
     {
         entry: {
-            style: './scss/style.scss'
+            style: './src/renderer/scss/style.scss'
         },
         output: {
-            path: path.resolve('./frontend/css'),
+            path: path.resolve('./dist/renderer/css'),
             filename: 'style.css'
         },
         module: {
@@ -45,9 +45,9 @@ module.exports = [
         ]
     },
     {
-        entry: './ts/font-awesome.ts',
+        entry: './src/renderer/ts/font-awesome.ts',
         output: {
-            path: path.resolve('./frontend/css'),
+            path: path.resolve('./dist/renderer/css'),
             filename: 'font-awesome.css'
         },
         module: {

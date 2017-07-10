@@ -2,12 +2,12 @@
   "name": "RadikoolEL",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "dist/main/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --watch",
     "run": "electron .",
-    "win32" : "electron-packager . RadikoolEL --overwrite --platform win32 --arch ia32 --icon=icon.ico  "
+    "win32" : "electron-packager ./dist RadikoolEL --overwrite --platform win32 --arch ia32 --icon=src/images/icon.ico  "
   },
   "keywords": [],
   "author": "",
