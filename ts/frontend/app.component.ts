@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {IStation} from './interfaces/station.interface';
 import {ILibrary} from './interfaces/library.interface';
-import {LibraryComponent} from './components/library.component';
 import {StateService} from './services/state.service';
 import {RadikoService} from "./services/radiko.service";
 
@@ -78,7 +77,7 @@ export class AppComponent implements OnInit{
     private playingFile:ILibrary;
 
     ngOnInit() {
-        const startPage = 'https://www.radikool.com/start/';
+        const startPage = 'https://www.radikool.com/start/?ver=radikoolEL';
         let webview = document.createElement('webview') as WebView;
         document.getElementById('webview-container').appendChild(webview);
         webview.setAttribute('src', startPage);
