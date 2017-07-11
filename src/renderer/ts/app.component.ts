@@ -19,7 +19,6 @@ class WebView extends HTMLElement{
     template: `
         <div id="main">
             <nav class="nav has-shadow">
-                <div class="container">
                     <div class="nav-menu nav-left">
                         <a class="nav-item is-tab" [class.is-active]="tool == 'info'" (click)="tool = 'info'">おしらせ</a>
                         <a class="nav-item is-tab" [class.is-active]="tool == 'programs'" (click)="tool = 'programs'">番組表</a>
@@ -28,16 +27,15 @@ class WebView extends HTMLElement{
                     <div class="nav-menu nav-right">
                         <a class="nav-item is-tab" [class.is-active]="tool == 'config'" (click)="tool = 'config'">設定</a>
                     </div>
-                </div>
             </nav>
             <div id="content">
                 <div id="webview-container" [hidden]="tool != 'info'">
                 </div>
                 <ng-container *ngIf="tool == 'programs'">
-                    <div style="width: 25%">
+                    <div style="width: 250px">
                         <StationList (selectStation)="onSelectStation($event)"></StationList>
                     </div>
-                    <div style="width: 75%">
+                    <div style="width: 75%; flex-grow: 1">
                         <ProgramList [station]="station" *ngIf="station"></ProgramList>
                     </div>
                 </ng-container>
@@ -77,7 +75,7 @@ export class AppComponent implements OnInit{
     private playingFile:ILibrary;
 
     ngOnInit() {
-        const startPage = 'https://www.radikool.com/start/?ver=radikoolEL';
+        const startPage = 'https://www.radikool.com/start/?ver=el0.1.0';
         let webview = document.createElement('webview') as WebView;
         document.getElementById('webview-container').appendChild(webview);
         webview.setAttribute('src', startPage);

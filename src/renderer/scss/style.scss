@@ -90,10 +90,9 @@ div{
   }
   td{
     border-right: 1px solid #bbb;
+    border-left: 1px solid #bbb;
     height: 100%;
-    &:first-child{
-      border-left: 1px solid #bbb;
-    }
+
 
     & > div{
       height: 100%;
