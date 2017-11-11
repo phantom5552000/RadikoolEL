@@ -7,11 +7,11 @@ export class Utility{
      * @returns {T}
      */
     public static copy<T>(src:T){
-        let res = {};
-        for(let key in src){
-            res[key] = src[key];
-        }
-
+        //let res = {};
+        //for(let key in src){
+        //    res.[key] = src[key];
+        //}
+        let res = JSON.parse(JSON.stringify(src))
         return res as T;
     };
 
